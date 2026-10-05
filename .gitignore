@@ -1,0 +1,28 @@
+# Rust build output
+/target/
+/dist/
+**/*.rs.bk
+*.pdb
+
+# Logs and runtime states
+/logs/
+*.log
+*.pid
+
+# IDE and Editor configurations
+.idea/
+.vscode/
+*.iml
+*.swp
+*.swo
+
+# OS generated files
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+.DS_Store
+
+# Temporary files
+*.tmp
+*.bak

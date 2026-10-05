@@ -1,0 +1,63 @@
+# Exclude Domain List for Zapret2
+# Домены, которые НЕ должны подвергаться модификации пакетов (DPI Desync)
+
+# Игровые сервисы, где desync может вызывать сбои или бан по IP
+twitch.tv
+steampowered.com
+steamcommunity.com
+steamusercontent.com
+epicgames.com
+epicgames.dev
+riotgames.com
+riotcdn.net
+leagueoflegends.com
+playvalorant.com
+minecraft.net
+xboxlive.com
+tanki.su
+lesta.ru
+korabli.su
+tanksblitz.ru
+
+# Драйверы и софт
+nvidia.com
+msi.com
+marketplace.visualstudio.com
+gallery.vsassets.io
+microsoft.com
+live.com
+sharepoint.com
+libreoffice.org
+7-zip.org
+win-rar.com
+ccleaner.com
+
+# Российские сервисы, маркетплейсы и банки
+yandex.ru
+ya.ru
+yandex.com
+yandex.net
+yastatic.net
+vk.com
+vk.ru
+vk.me
+vkvideo.ru
+ok.ru
+mail.ru
+gosuslugi.ru
+gov.ru
+nalog.ru
+spb.ru
+mos.ru
+wildberries.ru
+wb.ru
+ozon.ru
+ozon.com
+citilink.ru
+dns-shop.ru
+mts.ru
+2ip.ru
+habr.com
+boosty.to
+donationalerts.com
+reg.ru

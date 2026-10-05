@@ -1,0 +1,23 @@
+[package]
+name = "zapret2-gui"
+version = "1.0.5"
+edition = "2024"
+authors = ["Zapret2 Team"]
+description = "Modern Windows GUI Control Panel for zapret2 DPI bypass"
+license = "MIT"
+readme = "README.md"
+
+[dependencies]
+eframe = { version = "0.35.0", default-features = false, features = ["default_fonts", "glow"] }
+tray-icon = "0.26.0"
+ureq = "3.4.2"
+
+[build-dependencies]
+winres = "0.1.12"
+
+[profile.release]
+opt-level = 3
+lto = true
+codegen-units = 1
+panic = "abort"
+strip = true
