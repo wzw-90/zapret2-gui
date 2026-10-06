@@ -102,7 +102,7 @@ zapret2-gui/
 
 ```powershell
 # 1. Клонирование репозитория
-git clone https://github.com/wzwyz/zapret2-gui.git
+git clone https://github.com/wzw-90/zapret2-gui.git
 cd zapret2-gui
 
 # 2. Проверка и компиляция dev-сборки
