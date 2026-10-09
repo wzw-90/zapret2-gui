@@ -47,7 +47,7 @@
 
 ## 🚀 Быстрый старт
 
-1. Скачайте свежий релиз `ZapretGUI.exe` со страницы [**Releases**](https://github.com/wzwyz/zapret2-gui/releases).
+1. Скачайте свежий релиз `ZapretGUI.exe` со страницы [**Releases**](https://github.com/wzw-90/zapret2-gui/releases).
 2. Поместите файл в любую удобную папку (например, `C:\Program Files\Zapret` или на рабочий стол).
 3. Запустите `ZapretGUI.exe` (приложение запросит стандартное подтверждение прав Администратора UAC, необходимое драйверу перехвата пакетов WinDivert).
 4. Выберите нужный пресет (по умолчанию **«Основной (YouTube + Discord + Сайты)»**) и нажмите **«▶ ЗАПУСТИТЬ ZAPRET2»**.
