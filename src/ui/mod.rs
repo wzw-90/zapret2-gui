@@ -174,7 +174,7 @@ impl eframe::App for ZapretApp {
         ui.add_space(4.0);
         ui.horizontal(|ui| {
             ui.heading(RichText::new("⚡ Zapret2 Control").strong().color(Color32::from_rgb(100, 160, 255)));
-            ui.label(RichText::new(format!("v{}", env!("CARGO_PKG_VERSION"))).weak());
+            ui.label(RichText::new(concat!("v", env!("CARGO_PKG_VERSION"))).weak());
             ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
                 if self.is_admin {
                     ui.label(RichText::new("🛡️ Администратор").color(Color32::from_rgb(100, 220, 120)));
