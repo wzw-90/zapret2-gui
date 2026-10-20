@@ -180,14 +180,14 @@ impl Diagnostics {
     }
 
     pub fn check_windivert_files() -> bool {
-        let base = std::env::current_dir().unwrap_or_default();
+        let base = crate::assets::resolve_working_directory();
         let dll = base.join("bin").join("WinDivert.dll");
         let sys = base.join("bin").join("WinDivert64.sys");
         dll.exists() && sys.exists()
     }
 
     pub fn add_defender_exclusion() -> Result<(), String> {
-        let dir = std::env::current_dir().map_err(|e| e.to_string())?;
+        let dir = crate::assets::resolve_working_directory();
         let path_str = dir.to_string_lossy().to_string();
 
         let ps_cmd = format!(

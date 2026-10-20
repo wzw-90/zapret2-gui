@@ -56,7 +56,7 @@ pub fn get_exe_dir() -> PathBuf {
 }
 
 pub fn get_log_path() -> PathBuf {
-    get_exe_dir().join("logs").join("winws2.log")
+    resolve_working_directory().join("logs").join("winws2.log")
 }
 
 pub fn resolve_working_directory() -> PathBuf {

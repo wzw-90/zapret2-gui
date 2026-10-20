@@ -40,7 +40,8 @@ fn main() -> eframe::Result {
     }
 
     // 3. Подготавливаем рабочее окружение (распаковываем встроенные компоненты при необходимости)
-    let _ = assets::resolve_working_directory();
+    let working_dir = assets::resolve_working_directory();
+    let _ = std::env::set_current_dir(&working_dir);
 
     let icon_data = eframe::egui::IconData {
         rgba: ICON_RGBA_32.to_vec(),
