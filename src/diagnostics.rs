@@ -14,6 +14,8 @@ pub struct DiagnosticReport {
     pub active_adapters: Vec<String>,
     pub windivert_driver_present: bool,
     pub conflicting_software: Vec<String>,
+    pub system_proxy_active: bool,
+    pub system_proxy_server: Option<String>,
     pub youtube_status: String,
     pub youtube_latency_ms: Option<u128>,
     pub discord_status: String,
@@ -214,6 +216,7 @@ impl Diagnostics {
         let (lso_enabled, active_adapters) = Self::check_lso_and_adapters();
         let windivert_driver_present = Self::check_windivert_files();
         let conflicting_software = Self::check_conflicts();
+        let (system_proxy_active, system_proxy_server) = Self::check_system_proxy();
 
         // Тест доступности YouTube
         let (youtube_status, youtube_latency_ms) = Self::test_http("https://www.youtube.com");
@@ -233,11 +236,51 @@ impl Diagnostics {
             active_adapters,
             windivert_driver_present,
             conflicting_software,
+            system_proxy_active,
+            system_proxy_server,
             youtube_status,
             youtube_latency_ms,
             discord_status,
             discord_latency_ms,
         }
+    }
+
+    pub fn check_system_proxy() -> (bool, Option<String>) {
+        #[cfg(target_os = "windows")]
+        {
+            let ps_script = "Get-ItemProperty 'HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Internet Settings' | ForEach-Object { '' + $_.ProxyEnable + '|' + $_.ProxyServer }";
+            if let Ok(output) = silent_command("powershell")
+                .args(["-NoProfile", "-Command", ps_script])
+                .output()
+            {
+                let text = String::from_utf8_lossy(&output.stdout).trim().to_string();
+                if let Some((enable_str, server)) = text.split_once('|') {
+                    let enabled = enable_str.trim() == "1";
+                    let s = server.trim();
+                    let s_opt = if !s.is_empty() { Some(s.to_string()) } else { None };
+                    return (enabled, s_opt);
+                }
+            }
+        }
+        (false, None)
+    }
+
+    pub fn disable_system_proxy() -> Result<(), String> {
+        #[cfg(target_os = "windows")]
+        {
+            let ps_script = "Set-ItemProperty 'HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Internet Settings' -Name ProxyEnable -Value 0";
+            let output = silent_command("powershell")
+                .args(["-NoProfile", "-Command", ps_script])
+                .output()
+                .map_err(|e| e.to_string())?;
+            if output.status.success() {
+                Ok(())
+            } else {
+                Err(String::from_utf8_lossy(&output.stderr).to_string())
+            }
+        }
+        #[cfg(not(target_os = "windows"))]
+        Ok(())
     }
 
     fn test_http(url: &str) -> (String, Option<u128>) {
@@ -255,7 +298,13 @@ impl Diagnostics {
             }
             Err(e) => {
                 let ms = start.elapsed().as_millis();
-                (format!("Сбой: {}", e), Some(ms))
+                let err_str = e.to_string();
+                let status = if err_str.contains("11001") || err_str.contains("неизвестен") || err_str.contains("not found") {
+                    format!("Сбой DNS (хост не найден, 11001)")
+                } else {
+                    format!("Сбой: {}", err_str)
+                };
+                (status, Some(ms))
             }
         }
     }

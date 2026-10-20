@@ -147,7 +147,7 @@ impl ZapretApp {
                 });
 
                 ui.horizontal(|ui| {
-                    ui.label("Конфликтные сетевые драйверы:");
+                    ui.label("Конфликтные программы и драйверы:");
                     if report.conflicting_software.is_empty() {
                         ui.label(RichText::new("✓ Конфликтов не обнаружено").color(Color32::GREEN));
                     } else {
@@ -158,6 +158,26 @@ impl ZapretApp {
                             ))
                             .color(Color32::YELLOW),
                         );
+                    }
+                });
+
+                ui.horizontal(|ui| {
+                    ui.label("Системный прокси Windows:");
+                    if report.system_proxy_active {
+                        let s = report.system_proxy_server.as_deref().unwrap_or("127.0.0.1:10809");
+                        ui.label(RichText::new(format!("⚠️ Включен ({})", s)).color(Color32::YELLOW));
+                        if ui.button("❌ Отключить системный прокси").clicked() {
+                            match Diagnostics::disable_system_proxy() {
+                                Ok(_) => {
+                                    self.status_message = "Системный прокси Windows успешно отключен!".to_string();
+                                }
+                                Err(e) => {
+                                    self.status_message = format!("Ошибка отключения прокси: {}", e);
+                                }
+                            }
+                        }
+                    } else {
+                        ui.label(RichText::new("✓ Выключен (трафик идет напрямую)").color(Color32::GREEN));
                     }
                 });
 

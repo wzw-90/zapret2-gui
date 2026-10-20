@@ -1,6 +1,6 @@
 [package]
 name = "zapret2-gui"
-version = "1.0.7"
+version = "1.0.8"
 edition = "2024"
 authors = ["Zapret2 Team"]
 description = "Modern Windows GUI Control Panel for zapret2 DPI bypass"
