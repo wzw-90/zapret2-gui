@@ -36,6 +36,13 @@ impl ZapretApp {
                 }
             }
 
+            if ui.button("🌐 Настроить DNS (1.1.1.1)").clicked() {
+                match Diagnostics::fix_dns() {
+                    Ok(msg) => self.status_message = format!("✓ {}", msg),
+                    Err(e) => self.status_message = format!("Ошибка настройки DNS: {}", e),
+                }
+            }
+
             if ui.button("🛡️ Добавить в исключения Защитника").clicked() {
                 match Diagnostics::add_defender_exclusion() {
                     Ok(_) => {
