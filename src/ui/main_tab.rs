@@ -99,7 +99,16 @@ impl ZapretApp {
                                 "Ошибка: требуются права Администратора для загрузки драйвера!".to_string();
                         } else {
                             match self.engine.start() {
-                                Ok(_) => self.status_message = "Обход успешно запущен!".to_string(),
+                                Ok(terminated) => {
+                                    if !terminated.is_empty() {
+                                        self.status_message = format!(
+                                            "✓ Обход запущен! Завершены конфликтующие VPN: {}",
+                                            terminated.join(", ")
+                                        );
+                                    } else {
+                                        self.status_message = "✓ Обход успешно запущен!".to_string();
+                                    }
+                                }
                                 Err(err) => self.status_message = err,
                             }
                         }

@@ -94,8 +94,59 @@ impl EngineManager {
         }
     }
 
-    pub fn start(&mut self) -> Result<(), String> {
+    pub fn terminate_conflicting_vpns() -> Vec<String> {
+        let mut terminated = Vec::new();
+        let suspicious_processes = [
+            ("Happ", "happ.exe"),
+            ("Happ Daemon", "happd.exe"),
+            ("Xray Core", "xray.exe"),
+            ("V2Ray Core", "v2ray.exe"),
+            ("V2Ray", "wv2ray.exe"),
+            ("Sing-Box Core", "sing-box.exe"),
+            ("NekoRay / NekoBox", "nekoray.exe"),
+            ("NekoBox", "nekobox.exe"),
+            ("Clash", "clash.exe"),
+            ("Clash Meta", "clash-meta.exe"),
+            ("Mihomo", "mihomo.exe"),
+            ("Clash Verge", "clash-verge.exe"),
+            ("WireGuard", "wireguard.exe"),
+            ("OpenVPN", "openvpn.exe"),
+            ("Amnezia VPN", "amnezia-vpn.exe"),
+            ("Amnezia", "amneziavpn.exe"),
+            ("Hiddify", "hiddify.exe"),
+            ("Outline", "outline.exe"),
+            ("GoodbyeDPI", "goodbyedpi.exe"),
+            ("Zapret v1", "winws.exe"),
+        ];
+
+        for (display_name, proc_name) in suspicious_processes {
+            if let Ok(output) = silent_command("taskkill").args(["/F", "/IM", proc_name]).output() {
+                if output.status.success() {
+                    let name_str = display_name.to_string();
+                    if !terminated.contains(&name_str) {
+                        terminated.push(name_str);
+                    }
+                }
+            }
+        }
+
+        // Автоматически отключаем системный прокси Windows и сбрасываем DNS-кэш
+        #[cfg(target_os = "windows")]
+        {
+            let ps_script = "Set-ItemProperty 'HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Internet Settings' -Name ProxyEnable -Value 0 -ErrorAction SilentlyContinue; Clear-DnsClientCache";
+            let _ = silent_command("powershell")
+                .args(["-NoProfile", "-Command", ps_script])
+                .output();
+        }
+
+        terminated
+    }
+
+    pub fn start(&mut self) -> Result<Vec<String>, String> {
         self.stop();
+
+        // Завершаем все конфликтующие VPN и сбрасываем системный прокси перед стартом
+        let terminated_vpns = Self::terminate_conflicting_vpns();
 
         let base_dir = crate::assets::resolve_working_directory();
         let bin_path = base_dir.join("bin").join("winws2.exe");
@@ -154,7 +205,7 @@ impl EngineManager {
                         self.running.store(true, Ordering::SeqCst);
                         self.last_known_status = true;
                         self.last_status_check = Instant::now();
-                        Ok(())
+                        Ok(terminated_vpns)
                     }
                     Err(e) => Err(format!("Ошибка мониторинга процесса: {}", e)),
                 }
@@ -250,6 +301,8 @@ impl EngineManager {
         if !conf_path.exists() {
             return Err(format!("Файл конфигурации не найден: {:?}", conf_path));
         }
+
+        Self::terminate_conflicting_vpns();
 
         // Если служба уже существовала или была запущена - останавливаем и удаляем
         let _ = silent_command("cmd").args(["/c", "net stop winws2 >nul 2>&1"]).output();
