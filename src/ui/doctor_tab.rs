@@ -190,6 +190,18 @@ impl ZapretApp {
 
                 ui.separator();
 
+                let is_bypass_active = self.engine.is_running();
+                ui.horizontal(|ui| {
+                    ui.label("Статус обхода Zapret2:");
+                    if is_bypass_active {
+                        ui.label(RichText::new("✓ Обход активен (трафик расщепляется)").color(Color32::GREEN));
+                    } else {
+                        ui.label(RichText::new("⚠️ Обход выключен (нажмите «⚡ Запустить обход» на вкладке «Главная»)").color(Color32::YELLOW));
+                    }
+                });
+
+                ui.separator();
+
                 ui.horizontal(|ui| {
                     ui.label("Пинг YouTube (HTTPS):");
                     ui.label(RichText::new(&report.youtube_status).strong());

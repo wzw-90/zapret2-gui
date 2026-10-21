@@ -145,14 +145,14 @@ impl Diagnostics {
     pub fn fix_dns() -> Result<String, String> {
         #[cfg(target_os = "windows")]
         {
-            let ps_cmd = "Get-NetAdapter | Where-Object { $_.Status -eq 'Up' -and $_.InterfaceDescription -notmatch 'Virtual|Loopback|TAP|TUN|Happ' } | ForEach-Object { Set-DnsClientServerAddress -InterfaceIndex $_.InterfaceIndex -ServerAddresses ('1.1.1.1', '8.8.8.8') -ErrorAction SilentlyContinue }; Clear-DnsClientCache";
+            let ps_cmd = "Get-NetAdapter | Where-Object { $_.Status -eq 'Up' -and $_.InterfaceDescription -notmatch 'Virtual|Loopback|TAP|TUN|Happ' } | ForEach-Object { Set-DnsClientServerAddress -InterfaceIndex $_.InterfaceIndex -ServerAddresses ('1.1.1.1', '8.8.8.8') -ErrorAction SilentlyContinue; Disable-NetAdapterBinding -Name $_.Name -ComponentID ms_tcpip6 -ErrorAction SilentlyContinue }; Clear-DnsClientCache";
             let output = silent_command("powershell")
                 .args(["-NoProfile", "-ExecutionPolicy", "Bypass", "-Command", ps_cmd])
                 .output()
                 .map_err(|e| e.to_string())?;
 
             if output.status.success() {
-                Ok("Надежные DNS (1.1.1.1 и 8.8.8.8) установлены, кэш DNS очищен!".to_string())
+                Ok("Надежные DNS (1.1.1.1 и 8.8.8.8) установлены, сбои IPv6 устранены, кэш DNS очищен!".to_string())
             } else {
                 Err(String::from_utf8_lossy(&output.stderr).to_string())
             }
@@ -320,6 +320,8 @@ impl Diagnostics {
                 let err_str = e.to_string();
                 let status = if err_str.contains("11001") || err_str.contains("неизвестен") || err_str.contains("not found") {
                     format!("Сбой DNS (хост не найден, 11001)")
+                } else if err_str.contains("timeout") {
+                    format!("Блокировка ТСПУ (таймаут 7 сек — запустите обход на Главной)")
                 } else {
                     format!("Сбой: {}", err_str)
                 };
